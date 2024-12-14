@@ -29,15 +29,19 @@ body {
   padding: 20px;
   border: none; /* No border for a sleek look */
   padding-bottom: 70px;
+  height: 100vh;
 }
 
 /* Chat Bubbles */
 .message {
   padding: 0px 10px;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   border-radius: 10px;
   max-width: 60%; /* Slightly reduced bubble width for better spacing */
   word-wrap: break-word;
+  opacity: 0; /* Start hidden */
+  transform: translateY(20px); /* Start slightly off-screen */
+  animation: slideFadeIn 0.6s ease forwards; /* Slide and fade in */
 }
 
 .message.user {
@@ -50,6 +54,21 @@ body {
   background-color: #3a3a5c; /* Subtle dark purple for bot messages */
   color: #e4e4e4;
   align-self: flex-start;
+}
+
+/* Thought Message */
+.message.thought {
+  background-color: #3a3a5c; /* Subtle dark purple for bot messages */
+  color: rgba(255, 255, 255, 0.5);
+  align-self: flex-start;
+}
+
+/* Animation for Messages */
+@keyframes slideFadeIn {
+  to {
+    opacity: 1;
+    transform: translateY(0); /* Reset position */
+  }
 }
 
 /* Product Grid */
@@ -65,12 +84,11 @@ body {
 /* Product Card */
 .product-card {
   flex: 0 1 calc(20% - 10px); /* Fit 5 cards per row with spacing */
-  height: 260px; /* Reduced height */
   background-color: #353547; /* Slightly lighter dark purple */
   border-radius: 15px; /* Rounded corners for a modern look */
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
   padding: 15px;
   text-align: center;
@@ -106,7 +124,6 @@ body {
   margin: 5px 0;
   text-overflow: ellipsis;
   overflow: hidden;
-  white-space: nowrap; /* Prevent overflow text */
 }
 
 .product-card .price {

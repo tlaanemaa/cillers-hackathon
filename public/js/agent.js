@@ -57,6 +57,7 @@ export class Agent {
       model: MODEL,
       messages: this.messages,
       tools: tools,
+      response_format: { type: "json_object" },
     });
 
     const aiMessage = response.choices[0].message;
@@ -69,14 +70,26 @@ export class Agent {
         toolCalls.map(async (toolCall) => {
           console.log("Tool call:", toolCall);
           if (toolCall.function.name === "get_product_details") {
-            const query = JSON.parse(toolCall.function.arguments).query;
-            addMessage(`Searching for "${query}"...`, "bot");
-            const productDetails = await rag_search_items(query, 10);
             const function_call_result_message = {
               role: "tool",
-              content: JSON.stringify(productDetails),
+              content: null,
               tool_call_id: toolCall.id,
             };
+
+            try {
+              const query = JSON.parse(toolCall.function.arguments).query;
+              addMessage(`Searching for "${query}"...`, "thought");
+              const productDetails = await rag_search_items(query, 10);
+              addMessage(
+                `Found ${productDetails.length} products... thinking...`,
+                "thought"
+              );
+              function_call_result_message.content =
+                JSON.stringify(productDetails);
+            } catch (error) {
+              console.error("Error in get_product_details:", error);
+              function_call_result_message.content = String(error);
+            }
 
             this.messages.push(function_call_result_message);
           }
