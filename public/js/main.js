@@ -2,6 +2,7 @@ import { chatInput, chatMain, sendButton } from "./constants.js";
 import ItemExtractor from "./itemExtractor.js";
 import VectorSearch from "./VectorSearch.js";
 import FootwayAPI from "./FootwayAPI.js";
+import { a } from "./agent.js";
 
 // Initialize API classes
 const itemExtractor = new ItemExtractor("http://localhost:3001");

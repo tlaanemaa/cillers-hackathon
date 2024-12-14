@@ -1,148 +1,197 @@
-/* styles.css */
-
+/* Body */
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    background-color: #f9f9f9;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(
+    135deg,
+    #2a2a38,
+    #1e1e29
+  ); /* Gradient background */
+  color: #e4e4e4; /* Light text for contrast */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  height: 100vh;
 }
 
-.chat-container {
-    width: 100%;
-    max-width: 600px;
-    height: 100%;
-    background: #ffffff;
-    display: flex;
-    flex-direction: column;
-}
-
+/* Chat Container */
 .chat-main {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px;
-    background: #f1f1f1;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  box-sizing: border-box;
+  width: 100%; /* Stretch to full width */
+  background-color: #28283c; /* Dark background for the chat area */
+  border-radius: 0; /* Remove rounded corners for full-width layout */
+  overflow-y: auto;
+  padding: 20px;
+  border: none; /* No border for a sleek look */
+  padding-bottom: 70px;
 }
 
-.chat-main .message {
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
-    font-size: 1rem;
+/* Chat Bubbles */
+.message {
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+  max-width: 60%; /* Slightly reduced bubble width for better spacing */
+  word-wrap: break-word;
 }
 
-.chat-main .message.user {
-    background: #007bff;
-    color: #fff;
-    align-self: flex-end;
-    text-align: right;
+.message.user {
+  background-color: #6a4bf4; /* Purple for user messages */
+  color: #fff;
+  align-self: flex-end;
 }
 
-.chat-main .message.bot {
-    background: #ddd;
-    color: #000;
-    align-self: flex-start;
-    text-align: left;
+.message.bot {
+  background-color: #3a3a5c; /* Subtle dark purple for bot messages */
+  color: #e4e4e4;
+  align-self: flex-start;
 }
 
+/* Product Grid */
+.product-grid {
+  display: flex;
+  flex-wrap: wrap; /* Allow wrapping for multiple rows */
+  justify-content: space-between; /* Spread items evenly */
+  gap: 15px; /* Spacing between cards */
+  padding: 10px 0;
+  width: 100%; /* Full width for the grid */
+}
+
+/* Product Card */
+.product-card {
+  flex: 0 1 calc(20% - 10px); /* Fit 5 cards per row with spacing */
+  height: 260px; /* Reduced height */
+  background-color: #353547; /* Slightly lighter dark purple */
+  border-radius: 15px; /* Rounded corners for a modern look */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 15px;
+  text-align: center;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: scale(1.05); /* Slight zoom on hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Elevated shadow on hover */
+}
+
+/* Product Image */
+.product-card img {
+  width: 80%; /* Reduced width for a balanced look */
+  height: 100px; /* Reduced height */
+  object-fit: contain; /* Ensure the image fits within the card */
+  margin-bottom: 10px;
+  border-radius: 10px; /* Slightly rounded edges for images */
+}
+
+/* Product Details */
+.product-card h4 {
+  font-size: 0.9rem; /* Slightly smaller title */
+  color: #fff;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.product-card p {
+  font-size: 0.75rem; /* Smaller text for descriptions */
+  color: #b3b3d1; /* Soft purple text */
+  margin: 5px 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap; /* Prevent overflow text */
+}
+
+.product-card .price {
+  font-weight: bold;
+  color: #6a4bf4; /* Vibrant purple for prices */
+  margin: 10px 0;
+  font-size: 0.85rem; /* Smaller font for price */
+}
+
+.product-card .vendor {
+  font-size: 0.7rem; /* Smaller font for vendor text */
+  color: #888; /* Subtle gray for vendor text */
+}
+
+/* Responsive Grid */
+@media (max-width: 1400px) {
+  .product-card {
+    flex: 0 1 calc(25% - 10px); /* 4 cards per row for medium screens */
+  }
+}
+
+@media (max-width: 900px) {
+  .product-card {
+    flex: 0 1 calc(33.33% - 10px); /* 3 cards per row for smaller screens */
+  }
+}
+
+@media (max-width: 600px) {
+  .product-card {
+    flex: 0 1 calc(50% - 10px); /* 2 cards per row for very small screens */
+  }
+}
+
+@media (max-width: 400px) {
+  .product-card {
+    flex: 0 1 100%; /* 1 card per row for the smallest screens */
+  }
+}
+
+/* Input and Button */
 .chat-footer {
-    display: flex;
-    padding: 10px;
-    background: #fff;
-    border-top: 1px solid #ddd;
-    position: sticky;
-    bottom: 0;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  padding: 10px;
+  background-color: #28283c; /* Dark footer background */
+  border-top: 1px solid #4e4e6b;
 }
 
 #chat-input {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-right: 10px;
-    font-size: 1rem;
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #4e4e6b;
+  border-radius: 5px;
+  background-color: #1e1e29; /* Dark input field */
+  color: #fff;
+  font-size: 1rem;
+}
+
+#chat-input::placeholder {
+  color: #888;
 }
 
 #send-btn {
-    padding: 10px 15px;
-    background: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.3s;
+  padding: 10px 20px;
+  margin-left: 10px;
+  background: linear-gradient(
+    135deg,
+    #6a4bf4,
+    #5e3fe6
+  ); /* Purple gradient button */
+  color: #fff;
+  border: none;
+  border-radius: 10px; /* Rounded corners for button */
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
 #send-btn:hover {
-    background: #0056b3;
+  background: linear-gradient(
+    135deg,
+    #5e3fe6,
+    #6a4bf4
+  ); /* Reverse gradient on hover */
 }
-
-
-/* General Chat Styles */
-.chat-main {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-  
-  /* Product Grid Container */
-  .product-grid {
-    display: flex;
-    flex-wrap: nowrap; /* Keep items in a single line */
-    overflow-x: auto; /* Allow horizontal scrolling if needed */
-    gap: 15px;
-    padding: 10px 0;
-  }
-  
-  /* Product Card */
-  .product-card {
-    flex: 0 0 auto; /* Prevent cards from shrinking or growing */
-    width: 200px;
-    height: 300px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    text-align: center;
-    padding: 10px;
-  }
-  
-  .product-card img {
-    max-width: 100%;
-    max-height: 150px;
-    object-fit: contain; /* Ensure the image fits within the card */
-    border-radius: 5px;
-  }
-  
-  .product-card h4 {
-    font-size: 1rem;
-    margin: 10px 0;
-  }
-  
-  .product-card p {
-    font-size: 0.85rem;
-    color: #555;
-    margin: 5px 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap; /* Prevent overflow text */
-  }
-  
-  .product-card .price {
-    font-weight: bold;
-    color: #007bff;
-    margin: 10px 0;
-  }
-  
-  .product-card .vendor {
-    font-size: 0.75rem;
-    color: #888;
-  }
