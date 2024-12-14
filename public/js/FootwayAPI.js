@@ -25,13 +25,16 @@ export default class FootwayAPI {
     }
   }
 
-  async fetchProductDetails(vectorItems) {
-    console.log("Fetching product details for vector items...");
-    const allProducts = [];
-    for (const vectorItem of vectorItems) {
-      const products = await this.fetchProducts(vectorItem.name);
-      allProducts.push(...products);
-    }
-    return allProducts;
+  async fetchProductDetails(topVectors) {
+    console.log("Fetching product details for top vector items...");
+    const allProducts = await Promise.all(
+      topVectors.map(async (vectorItem) => {
+        const products = await this.fetchProducts(vectorItem.metadata.product_name);
+        return products.length > 0 ? products[0] : null; // Take the top product
+      })
+    );
+
+    // Filter out nulls (in case no products were found for some vectors)
+    return allProducts.filter((product) => product !== null);
   }
 }

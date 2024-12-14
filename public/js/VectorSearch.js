@@ -23,9 +23,26 @@ export default class VectorSearch {
     }
   }
 
-  async fetchVectorsForItems(items) {
-    console.log("Fetching vector results for multiple items...");
-    const vectorResults = await Promise.all(items.map((item) => this.search(item)));
-    return vectorResults.flat();
+  async fetchTopVectorsForItems(items, similarityThreshold = 0.3, topN = 3) {
+    console.log("Fetching top vector results for multiple items...");
+    const topVectors = await Promise.all(
+      items.map(async (item) => {
+        const results = await this.search(item);
+
+        // Filter results based on similarity threshold
+        const filteredResults = results.filter(
+          (result) => result.similarity_score >= similarityThreshold
+        );
+
+        // Sort filtered results by similarity_score in descending order
+        filteredResults.sort((a, b) => b.similarity_score - a.similarity_score);
+
+        // Return top N results
+        return filteredResults.slice(0, topN);
+      })
+    );
+
+    // Flatten the results and remove any empty arrays
+    return topVectors.flat();
   }
 }

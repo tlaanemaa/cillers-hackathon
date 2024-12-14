@@ -33,17 +33,49 @@ async function handleUserInput() {
     const extractedItems = await itemExtractor.extractItems(userMessage);
     addMessage(`I found these items: ${extractedItems.join(", ")}`, "bot");
 
-    // Step 2: Fetch vector database results
-    const vectorResults = await vectorSearch.fetchVectorsForItems(extractedItems);
+    // Step 2: Fetch top vector database results
+    const topVectors = await vectorSearch.fetchTopVectorsForItems(
+      extractedItems
+    );
 
-    // Step 3: Fetch product data from Footway API
-    const products = await footwayAPI.fetchProductDetails(vectorResults);
+    // Step 3: Fetch top product data from Footway API
+    const topProducts = await footwayAPI.fetchProductDetails(topVectors);
 
     // Step 4: Display product data
-    if (products.length > 0) {
-      addMessage("Here are the product recommendations:", "bot");
-      products.forEach((product) => {
-        addMessage(`- ${product.name}: ${product.description}`, "bot");
+    if (topProducts.length > 0) {
+      addMessage("Here are the top product recommendations:", "bot");
+
+      // Log each product in a formatted manner
+      topProducts.forEach((product) => {
+        const productDetails = `
+          Name: ${product.productName || "Unknown"}
+          Vendor: ${product.vendor || "Unknown"}
+          Description: ${
+            product.product_description || "No description available"
+          }
+          Size: ${product.size || "N/A"}
+          Department: ${product.department?.join(", ") || "N/A"}
+          Type: ${product.productType?.join(", ") || "N/A"}
+          Group: ${product.productGroup?.join(", ") || "N/A"}
+          Quantity: ${product.quantity || 0}
+          Price: ${product.price !== null ? `$${product.price}` : "N/A"}
+          Image: ${product.image_url || "No image available"}
+        `;
+        console.log(productDetails); // Log the product details to the console
+
+        // Display product details in the chat
+        const productMessage = `
+          - **${product.productName || "Unknown"}** by ${
+          product.vendor || "Unknown"
+        }
+          ${product.product_description || "No description available"}
+          ${
+            product.image_url
+              ? `<img src="${product.image_url}" alt="${product.productName}" width="100">`
+              : ""
+          }
+        `;
+        addMessage(productMessage, "bot");
       });
     } else {
       addMessage("No products found for your search.", "bot");
