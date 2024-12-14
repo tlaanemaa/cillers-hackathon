@@ -3,6 +3,8 @@ import { OPENAI_KEY } from "./keys.js";
 import { AGENT_SYS, getAgentPrompt } from "./prompts.js";
 import { rag_search_items, addMessage } from "./util.js";
 
+const MODEL = "gpt-4o-mini";
+
 const tools = [
   {
     type: "function",
@@ -52,7 +54,7 @@ export class Agent {
   // Run the OpenAI conversation
   async getOpenAIResponse() {
     const response = await this.client.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: MODEL,
       messages: this.messages,
       tools: tools,
     });
@@ -69,7 +71,7 @@ export class Agent {
           if (toolCall.function.name === "get_product_details") {
             const query = JSON.parse(toolCall.function.arguments).query;
             addMessage(`Searching for "${query}"...`, "bot");
-            const productDetails = await rag_search_items(query, 3);
+            const productDetails = await rag_search_items(query, 10);
             const function_call_result_message = {
               role: "tool",
               content: JSON.stringify(productDetails),

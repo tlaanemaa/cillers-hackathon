@@ -1,3 +1,4 @@
+import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
 import { chatMain } from "./constants.js";
 import VectorSearch from "./VectorStore.js";
 import FootwayAPI from "./FootwayAPI.js";
@@ -23,7 +24,7 @@ export async function rag_search_items(query, num_items) {
 export function addMessage(content, sender = "bot") {
   const messageDiv = document.createElement("div");
   messageDiv.classList.add("message", sender);
-  messageDiv.textContent = content;
+  messageDiv.innerHTML = marked.parse(content);
   chatMain.appendChild(messageDiv);
   chatMain.scrollTop = chatMain.scrollHeight;
 }

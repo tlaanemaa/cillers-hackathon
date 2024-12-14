@@ -33,7 +33,7 @@ body {
 
 /* Chat Bubbles */
 .message {
-  padding: 10px 15px;
+  padding: 0px 10px;
   margin-bottom: 10px;
   border-radius: 10px;
   max-width: 60%; /* Slightly reduced bubble width for better spacing */
