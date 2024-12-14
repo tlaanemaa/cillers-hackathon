@@ -17,7 +17,6 @@ function addMessage(content, sender = "bot") {
   chatMain.scrollTop = chatMain.scrollHeight;
 }
 
-// Orchestrator function to handle user input
 async function handleUserInput() {
   const userMessage = chatInput.value.trim();
   if (!userMessage) return;
@@ -45,38 +44,31 @@ async function handleUserInput() {
     if (topProducts.length > 0) {
       addMessage("Here are the top product recommendations:", "bot");
 
-      // Log each product in a formatted manner
-      topProducts.forEach((product) => {
-        const productDetails = `
-          Name: ${product.productName || "Unknown"}
-          Vendor: ${product.vendor || "Unknown"}
-          Description: ${
-            product.product_description || "No description available"
-          }
-          Size: ${product.size || "N/A"}
-          Department: ${product.department?.join(", ") || "N/A"}
-          Type: ${product.productType?.join(", ") || "N/A"}
-          Group: ${product.productGroup?.join(", ") || "N/A"}
-          Quantity: ${product.quantity || 0}
-          Price: ${product.price !== null ? `$${product.price}` : "N/A"}
-          Image: ${product.image_url || "No image available"}
-        `;
-        console.log(productDetails); // Log the product details to the console
+      // Create a container for product cards
+      const productGrid = document.createElement("div");
+      productGrid.classList.add("product-grid");
 
-        // Display product details in the chat
-        const productMessage = `
-          - **${product.productName || "Unknown"}** by ${
-          product.vendor || "Unknown"
-        }
-          ${product.product_description || "No description available"}
-          ${
-            product.image_url
-              ? `<img src="${product.image_url}" alt="${product.productName}" width="100">`
-              : ""
-          }
+      // Create a product card for each product
+      topProducts.forEach((product) => {
+        const productCard = document.createElement("div");
+        productCard.classList.add("product-card");
+
+        productCard.innerHTML = `
+          <img src="${product.image_url}" alt="${product.productName}" />
+          <h4>${product.productName || "Unknown"}</h4>
+          <p>${product.product_description || "No description available"}</p>
+          <p class="price">${
+            product.price !== null ? `$${product.price}` : "N/A"
+          }</p>
+          <p class="vendor">${product.vendor || "Unknown Vendor"}</p>
         `;
-        addMessage(productMessage, "bot");
+
+        productGrid.appendChild(productCard);
       });
+
+      // Append the product grid to the chat
+      chatMain.appendChild(productGrid);
+      chatMain.scrollTop = chatMain.scrollHeight;
     } else {
       addMessage("No products found for your search.", "bot");
     }

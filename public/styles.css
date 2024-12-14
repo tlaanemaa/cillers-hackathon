@@ -80,3 +80,69 @@ body {
 #send-btn:hover {
     background: #0056b3;
 }
+
+
+/* General Chat Styles */
+.chat-main {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  /* Product Grid Container */
+  .product-grid {
+    display: flex;
+    flex-wrap: nowrap; /* Keep items in a single line */
+    overflow-x: auto; /* Allow horizontal scrolling if needed */
+    gap: 15px;
+    padding: 10px 0;
+  }
+  
+  /* Product Card */
+  .product-card {
+    flex: 0 0 auto; /* Prevent cards from shrinking or growing */
+    width: 200px;
+    height: 300px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+    padding: 10px;
+  }
+  
+  .product-card img {
+    max-width: 100%;
+    max-height: 150px;
+    object-fit: contain; /* Ensure the image fits within the card */
+    border-radius: 5px;
+  }
+  
+  .product-card h4 {
+    font-size: 1rem;
+    margin: 10px 0;
+  }
+  
+  .product-card p {
+    font-size: 0.85rem;
+    color: #555;
+    margin: 5px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; /* Prevent overflow text */
+  }
+  
+  .product-card .price {
+    font-weight: bold;
+    color: #007bff;
+    margin: 10px 0;
+  }
+  
+  .product-card .vendor {
+    font-size: 0.75rem;
+    color: #888;
+  }
