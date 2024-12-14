@@ -30,7 +30,4 @@ You are an expert shopping advisor. Think deeply about the user’s question, pr
 `;
 
 export const getAgentPrompt = (user_question, productInfo = []) =>
-  `
-## User question:
-${user_question}
-`;
+  user_question;
