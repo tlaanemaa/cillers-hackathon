@@ -1,6 +1,24 @@
 import { OpenAI } from "https://cdn.jsdelivr.net/npm/openai@4.76.3/+esm";
 import { OPENAI_KEY } from "./keys.js";
 import { AGENT_SYS, getAgentPrompt } from "./prompts.js";
+import { rag_search_items } from "./util.js";
+
+const tools = [
+  {
+    type: "function",
+    function: {
+      name: "get_product_details",
+      parameters: {
+        type: "object",
+        properties: {
+          query: { type: "string" },
+        },
+      },
+    },
+  },
+];
+
+rag_search_items("socks", 3)
 
 export class Agent {
   constructor(vectorSearch, footwayAPI) {
@@ -39,9 +57,26 @@ export class Agent {
       const response = await this.client.chat.completions.create({
         model: "gpt-4o-mini",
         messages: this.messages,
+        tools: tools,
       });
+      const toolCalls = response.choices[0].message.tool_calls;
       const aiMessage = response.choices[0].message.content;
       this.addAssistantMessage(aiMessage); // Save the AI's response to the thread
+
+      if (toolCalls && toolCalls.length > 0) {
+        results = Promise.all(
+          toolCalls.map(async (toolCall) => {
+            if (toolCall.function === "get_product_details") {
+              const query = toolCall.parameters.query;
+              const productDetails = await this.footwayAPI.fetchProductDetails(
+                [query]
+              );
+              return productDetails;
+            }
+          })
+        );
+        console.log("Tool calls detected in the response:")
+      }
       return aiMessage;
     } catch (error) {
       console.error("Error communicating with OpenAI:", error);
@@ -58,25 +93,22 @@ export class Agent {
       // Step 2: Run a vector search to get context
       const contextResults = await this.vectorSearch.fetchTopVectorsForItems(
         [userQuestion],
-        0.3, // Similarity threshold
-        3 // Top N results
+        0.5, // Similarity threshold
+        10 // Top N results
       );
 
-      // If no context is found, continue with just the question
-      const contextInfo = contextResults.map(
-        (result) => `${result.metadata.product_name} - ${result.description}`
+      // Step 2.5: Get product details from FootwayAPI
+      const productDetails = await this.footwayAPI.fetchProductDetails(
+        contextResults.map((result) => result.name)
       );
 
-      // Step 3: Format the prompt with question and context
-      const contextString =
-        contextInfo.length > 0 ? contextInfo.join("\n") : "No context found.";
-      const aiPrompt = getAgentPrompt(userQuestion, contextString);
+      const aiPrompt = getAgentPrompt(userQuestion, productDetails);
       this.addUserMessage(aiPrompt);
 
-      // Step 4: Get AI response
+      // Step 5: Get AI response
       const aiResponse = await this.getOpenAIResponse();
 
-      // Step 5: Parse the AI response as JSON
+      // Step 6: Parse the AI response as JSON
       let parsedResponse;
       try {
         parsedResponse = JSON.parse(aiResponse);
@@ -88,7 +120,7 @@ export class Agent {
       // Validate the structure of the JSON response
       if (!parsedResponse.response || !Array.isArray(parsedResponse.items)) {
         throw new Error(
-          "Invalid JSON response format. Expected 'freetext' and 'items' fields."
+          "Invalid JSON response format. Expected 'response' and 'items' fields."
         );
       }
 

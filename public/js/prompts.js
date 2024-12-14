@@ -11,15 +11,16 @@ You are an expert shopping advisor. You specialize in understanding user prefere
 - Use the provided context to improve the specificity and usefulness of your recommendations.
 - If you need to clarify or ask questions for more details, incorporate these queries into the "response" field, but still remain entirely within the JSON structure.
 - If you are not confident in your response, **always** ask for more information before providing recommendations.
+- Be concise and use conversational tone, like a friendly human.
 
 Your role is to serve as the user’s trusted shopping advisor, providing the most suitable suggestions possible.
 `;
 
-export const getAgentPrompt = (user_question, contextInfo) =>
+export const getAgentPrompt = (user_question, productInfo = []) =>
   `
 ## User question:
 ${user_question}
 
-## Relevant context:
-${contextInfo}
+## Related products:
+${JSON.stringify(productInfo, null, 2)}
 `;
