@@ -22,4 +22,10 @@ export default class VectorSearch {
       return [];
     }
   }
+
+  async fetchVectorsForItems(items) {
+    console.log("Fetching vector results for multiple items...");
+    const vectorResults = await Promise.all(items.map((item) => this.search(item)));
+    return vectorResults.flat();
+  }
 }
