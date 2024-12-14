@@ -1,5 +1,5 @@
 import { chatInput, chatMain, sendButton } from "./constants.js";
-import VectorSearch from "./VectorSearch.js";
+import VectorSearch from "./VectorStore.js";
 import FootwayAPI from "./FootwayAPI.js";
 import { Agent } from "./agent.js";
 
