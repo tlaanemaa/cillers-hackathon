@@ -18,8 +18,6 @@ const tools = [
   },
 ];
 
-rag_search_items("socks", 3)
-
 export class Agent {
   constructor(vectorSearch, footwayAPI) {
     this.client = new OpenAI({
@@ -46,89 +44,49 @@ export class Agent {
     this.messages.push({ role: "user", content: userMessage });
   }
 
-  // Add an assistant message
-  addAssistantMessage(assistantMessage) {
-    this.messages.push({ role: "assistant", content: assistantMessage });
-  }
-
   // Run the OpenAI conversation
   async getOpenAIResponse() {
-    try {
-      const response = await this.client.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: this.messages,
-        tools: tools,
-      });
-      const toolCalls = response.choices[0].message.tool_calls;
-      const aiMessage = response.choices[0].message.content;
-      this.addAssistantMessage(aiMessage); // Save the AI's response to the thread
+    const response = await this.client.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: this.messages,
+      tools: tools,
+    });
 
-      if (toolCalls && toolCalls.length > 0) {
-        results = Promise.all(
-          toolCalls.map(async (toolCall) => {
-            if (toolCall.function === "get_product_details") {
-              const query = toolCall.parameters.query;
-              const productDetails = await this.footwayAPI.fetchProductDetails(
-                [query]
-              );
-              return productDetails;
-            }
-          })
-        );
-        console.log("Tool calls detected in the response:")
-      }
-      return aiMessage;
-    } catch (error) {
-      console.error("Error communicating with OpenAI:", error);
-      throw new Error("Failed to get OpenAI response.");
+    const aiMessage = response.choices[0].message;
+    this.messages.push(aiMessage); // Save the AI's response to the thread
+    if (aiMessage.content) return aiMessage.content;
+
+    const toolCalls = aiMessage.tool_calls;
+    if (toolCalls && toolCalls.length > 0) {
+      await Promise.all(
+        toolCalls.map(async (toolCall) => {
+          console.log("Tool call:", toolCall);
+          if (toolCall.function.name === "get_product_details") {
+            const query = JSON.parse(toolCall.function.arguments).query;
+            const productDetails = await rag_search_items(query, 3);
+            const function_call_result_message = {
+              role: "tool",
+              content: JSON.stringify(productDetails),
+              tool_call_id: toolCall.id,
+            };
+
+            this.messages.push(function_call_result_message);
+          }
+        })
+      );
+      return this.getOpenAIResponse();
     }
   }
 
   // Main question handler: question -> vector search -> AI call -> response
   async askQuestion(userQuestion) {
-    try {
-      // Step 1: Add the user's question to the conversation
-      this.addUserMessage(userQuestion);
+    const agentPrompt = getAgentPrompt(userQuestion);
+    this.addUserMessage(agentPrompt);
 
-      // Step 2: Run a vector search to get context
-      const contextResults = await this.vectorSearch.fetchTopVectorsForItems(
-        [userQuestion],
-        0.5, // Similarity threshold
-        10 // Top N results
-      );
+    const aiResponse = await this.getOpenAIResponse();
+    const parsedResponse = JSON.parse(aiResponse);
 
-      // Step 2.5: Get product details from FootwayAPI
-      const productDetails = await this.footwayAPI.fetchProductDetails(
-        contextResults.map((result) => result.name)
-      );
-
-      const aiPrompt = getAgentPrompt(userQuestion, productDetails);
-      this.addUserMessage(aiPrompt);
-
-      // Step 5: Get AI response
-      const aiResponse = await this.getOpenAIResponse();
-
-      // Step 6: Parse the AI response as JSON
-      let parsedResponse;
-      try {
-        parsedResponse = JSON.parse(aiResponse);
-      } catch (error) {
-        console.error("Failed to parse AI response as JSON:", aiResponse);
-        throw new Error("AI response is not valid JSON.");
-      }
-
-      // Validate the structure of the JSON response
-      if (!parsedResponse.response || !Array.isArray(parsedResponse.items)) {
-        throw new Error(
-          "Invalid JSON response format. Expected 'response' and 'items' fields."
-        );
-      }
-
-      // Return the structured response
-      return parsedResponse;
-    } catch (error) {
-      console.error("Error handling question:", error);
-      throw new Error("Failed to process the question.");
-    }
+    // Return the structured response
+    return parsedResponse;
   }
 }

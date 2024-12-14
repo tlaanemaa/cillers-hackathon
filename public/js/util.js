@@ -14,5 +14,5 @@ export async function rag_search_items(query, num_items) {
   const topProducts = await footwayAPI.fetchProductDetails(
     vectors.map((item) => item.metadata.product_name) // Map to the expected structure
   );
-  console.log("a")
+  return topProducts;
 }

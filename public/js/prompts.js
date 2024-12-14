@@ -20,7 +20,4 @@ export const getAgentPrompt = (user_question, productInfo = []) =>
   `
 ## User question:
 ${user_question}
-
-## Related products:
-${JSON.stringify(productInfo, null, 2)}
 `;
