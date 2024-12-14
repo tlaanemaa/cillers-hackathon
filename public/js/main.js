@@ -1,13 +1,12 @@
 import { chatInput, chatMain, sendButton } from "./constants.js";
-import ItemExtractor from "./itemExtractor.js";
 import VectorSearch from "./VectorSearch.js";
 import FootwayAPI from "./FootwayAPI.js";
-import { a } from "./agent.js";
+import { Agent } from "./agent.js";
 
 // Initialize API classes
-const itemExtractor = new ItemExtractor("http://localhost:3001");
 const vectorSearch = new VectorSearch("http://localhost:3001");
 const footwayAPI = new FootwayAPI("http://localhost:3001");
+const agent = new Agent(vectorSearch, footwayAPI);
 
 // Utility: Add a message to the chat
 function addMessage(content, sender = "bot") {
@@ -29,27 +28,21 @@ async function handleUserInput() {
   try {
     console.log("Processing user input...");
 
-    // Step 1: Extract items of interest
-    const extractedItems = await itemExtractor.extractItems(userMessage);
-    addMessage(`I found these items: ${extractedItems.join(", ")}`, "bot");
+    // Use the agent to process the question
+    const response = await agent.askQuestion(userMessage);
 
-    // Step 2: Fetch top vector database results
-    const topVectors = await vectorSearch.fetchTopVectorsForItems(
-      extractedItems
-    );
+    // Display the freetext response in the chat
+    addMessage(response.response, "bot");
 
-    // Step 3: Fetch top product data from Footway API
-    const topProducts = await footwayAPI.fetchProductDetails(topVectors);
+    // If items are included, fetch and display product details
+    if (response.items && response.items.length > 0) {
+      const topProducts = await footwayAPI.fetchProductDetails(
+        response.items.map((item) => ({ name: item })) // Map to the expected structure
+      );
 
-    // Step 4: Display product data
-    if (topProducts.length > 0) {
-      addMessage("Here are the top product recommendations:", "bot");
-
-      // Create a container for product cards
       const productGrid = document.createElement("div");
       productGrid.classList.add("product-grid");
 
-      // Create a product card for each product
       topProducts.forEach((product) => {
         const productCard = document.createElement("div");
         productCard.classList.add("product-card");
@@ -67,17 +60,19 @@ async function handleUserInput() {
         productGrid.appendChild(productCard);
       });
 
-      // Append the product grid to the chat
       chatMain.appendChild(productGrid);
       chatMain.scrollTop = chatMain.scrollHeight;
-    } else {
-      addMessage("No products found for your search.", "bot");
     }
   } catch (error) {
     console.error("Error in orchestrator:", error);
     addMessage("Sorry, something went wrong. Please try again.", "bot");
   }
 }
+
+// Initialize conversation on page load
+agent.initializeConversation(
+  "You are a helpful assistant helping users find the best products."
+);
 
 // Event listener for send button
 sendButton.addEventListener("click", handleUserInput);
