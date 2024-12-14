@@ -2,20 +2,12 @@ import { chatInput, chatMain, sendButton } from "./constants.js";
 import VectorSearch from "./VectorStore.js";
 import FootwayAPI from "./FootwayAPI.js";
 import { Agent } from "./agent.js";
+import { addMessage } from "./util.js";
 
 // Initialize API classes
 const vectorSearch = new VectorSearch("http://localhost:3001");
 const footwayAPI = new FootwayAPI("http://localhost:3001");
 const agent = new Agent(vectorSearch, footwayAPI);
-
-// Utility: Add a message to the chat
-function addMessage(content, sender = "bot") {
-  const messageDiv = document.createElement("div");
-  messageDiv.classList.add("message", sender);
-  messageDiv.textContent = content;
-  chatMain.appendChild(messageDiv);
-  chatMain.scrollTop = chatMain.scrollHeight;
-}
 
 async function handleUserInput() {
   const userMessage = chatInput.value.trim();
@@ -36,14 +28,10 @@ async function handleUserInput() {
 
     // If items are included, fetch and display product details
     if (response.items && response.items.length > 0) {
-      const topProducts = await footwayAPI.fetchProductDetails(
-        response.items.map((item) => ({ name: item })) // Map to the expected structure
-      );
-
       const productGrid = document.createElement("div");
       productGrid.classList.add("product-grid");
 
-      topProducts.forEach((product) => {
+      response.items.forEach((product) => {
         const productCard = document.createElement("div");
         productCard.classList.add("product-card");
 

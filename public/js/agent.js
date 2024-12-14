@@ -1,7 +1,7 @@
 import { OpenAI } from "https://cdn.jsdelivr.net/npm/openai@4.76.3/+esm";
 import { OPENAI_KEY } from "./keys.js";
 import { AGENT_SYS, getAgentPrompt } from "./prompts.js";
-import { rag_search_items } from "./util.js";
+import { rag_search_items, addMessage } from "./util.js";
 
 const tools = [
   {
@@ -63,6 +63,7 @@ export class Agent {
           console.log("Tool call:", toolCall);
           if (toolCall.function.name === "get_product_details") {
             const query = JSON.parse(toolCall.function.arguments).query;
+            addMessage(`Searching for "${query}"...`, "bot");
             const productDetails = await rag_search_items(query, 3);
             const function_call_result_message = {
               role: "tool",
