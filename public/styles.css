@@ -56,7 +56,7 @@ body {
 .product-grid {
   display: flex;
   flex-wrap: wrap; /* Allow wrapping for multiple rows */
-  justify-content: space-between; /* Spread items evenly */
+  justify-content: space-around; /* Spread items evenly */
   gap: 15px; /* Spacing between cards */
   padding: 10px 0;
   width: 100%; /* Full width for the grid */

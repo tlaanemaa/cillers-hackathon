@@ -8,10 +8,15 @@ const tools = [
     type: "function",
     function: {
       name: "get_product_details",
+      description: "Get product details from the Footway API",
       parameters: {
         type: "object",
         properties: {
-          query: { type: "string" },
+          query: {
+            type: "string",
+            description:
+              "A detailed query describing what you want to look for",
+          },
         },
       },
     },
