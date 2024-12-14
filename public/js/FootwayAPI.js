@@ -29,7 +29,7 @@ export default class FootwayAPI {
     console.log("Fetching product details for top vector items...");
     const allProducts = await Promise.all(
       topVectors.map(async (vectorItem) => {
-        const products = await this.fetchProducts(vectorItem.metadata.product_name);
+        const products = await this.fetchProducts(vectorItem.name);
         return products.length > 0 ? products[0] : null; // Take the top product
       })
     );
